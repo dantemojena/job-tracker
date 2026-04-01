@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Job Match - Job Tracker{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Job Match</h1>
+    <p class="subtitle">Enter your skills to find the best-matching jobs</p>
+</div>
+
+<!-- Skills Input -->
+<div class="card form-card">
+    <form method="POST">
+        <div class="form-group">
+            <label for="skills">Your Skills (comma-separated)</label>
+            <input type="text" id="skills" name="skills" value="{{ user_skills }}"
+                   placeholder="e.g. Python, SQL, Flask, HTML, CSS" class="input-large">
+            <small class="form-hint">Enter the skills you have, separated by commas. We'll match them against job requirements.</small>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">&#128269; Find Matching Jobs</button>
+        </div>
+    </form>
+</div>
+
+<!-- Results -->
+{% if results is not none %}
+<div class="card">
+    <h2 class="card-title">Match Results</h2>
+
+    {% if results %}
+        <div class="match-results">
+            {% for r in results %}
+            <div class="match-card {{ 'match-high' if r.match_percentage >= 75 else ('match-med' if r.match_percentage >= 50 else 'match-low') }}">
+                <div class="match-header">
+                    <div class="match-info">
+                        <h3>{{ r.job.job_title }}</h3>
+                        <span class="match-company">{{ r.job.company_name or 'Unknown Company' }}</span>
+                        {% if r.job.job_type %}
+                            <span class="type-badge">{{ r.job.job_type }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="match-score">
+                        <div class="score-circle {{ 'score-high' if r.match_percentage >= 75 else ('score-med' if r.match_percentage >= 50 else 'score-low') }}">
+                            {{ r.match_percentage }}%
+                        </div>
+                        <span class="score-label">{{ r.matched_skills }}/{{ r.total_skills }} skills</span>
+                    </div>
+                </div>
+
+                {% if r.job.salary_min or r.job.salary_max %}
+                <div class="match-salary">
+                    Salary:
+                    {% if r.job.salary_min and r.job.salary_max %}
+                        ${{ "{:,}".format(r.job.salary_min) }} – ${{ "{:,}".format(r.job.salary_max) }}
+                    {% elif r.job.salary_min %}
+                        From ${{ "{:,}".format(r.job.salary_min) }}
+                    {% elif r.job.salary_max %}
+                        Up to ${{ "{:,}".format(r.job.salary_max) }}
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                {% if r.missing_skills %}
+                <div class="match-missing">
+                    <strong>Missing skills:</strong>
+                    {% for skill in r.missing_skills %}
+                        <span class="skill-tag skill-missing">{{ skill }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="match-perfect">&#10003; You match all required skills!</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="empty-state">No jobs found with requirements to match against. <a href="{{ url_for('jobs_add') }}">Add jobs with skill requirements</a> first.</p>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

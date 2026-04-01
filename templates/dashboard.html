@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - Job Tracker{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Dashboard</h1>
+    <p class="subtitle">Your job search at a glance</p>
+</div>
+
+<!-- Stats Cards -->
+<div class="stats-grid">
+    <div class="stat-card stat-blue">
+        <div class="stat-number">{{ stats.total_companies }}</div>
+        <div class="stat-label">Companies</div>
+    </div>
+    <div class="stat-card stat-green">
+        <div class="stat-number">{{ stats.total_jobs }}</div>
+        <div class="stat-label">Jobs Tracked</div>
+    </div>
+    <div class="stat-card stat-orange">
+        <div class="stat-number">{{ stats.total_applications }}</div>
+        <div class="stat-label">Applications</div>
+    </div>
+    <div class="stat-card stat-purple">
+        <div class="stat-number">{{ stats.total_contacts }}</div>
+        <div class="stat-label">Contacts</div>
+    </div>
+</div>
+
+<!-- Two Column Layout -->
+<div class="dashboard-columns">
+    <!-- Application Status Breakdown -->
+    <div class="card">
+        <h2 class="card-title">Application Status</h2>
+        {% if stats.status_breakdown %}
+            <div class="status-bars">
+                {% for item in stats.status_breakdown %}
+                <div class="status-row">
+                    <span class="status-badge status-{{ item.status|lower }}">{{ item.status }}</span>
+                    <div class="status-bar-track">
+                        <div class="status-bar-fill" style="width: {{ (item.count / stats.total_applications * 100)|int if stats.total_applications > 0 else 0 }}%"></div>
+                    </div>
+                    <span class="status-count">{{ item.count }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="empty-state">No applications yet. <a href="{{ url_for('applications_add') }}">Add one!</a></p>
+        {% endif %}
+    </div>
+
+    <!-- Recent Applications -->
+    <div class="card">
+        <h2 class="card-title">Recent Applications</h2>
+        {% if stats.recent_apps %}
+            <div class="recent-list">
+                {% for app in stats.recent_apps %}
+                <div class="recent-item">
+                    <div class="recent-info">
+                        <strong>{{ app.job_title or 'Unknown Job' }}</strong>
+                        <span class="recent-company">{{ app.company_name or 'Unknown Company' }}</span>
+                    </div>
+                    <div class="recent-meta">
+                        <span class="status-badge status-{{ app.status|lower }}">{{ app.status }}</span>
+                        <span class="recent-date">{{ app.application_date }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="empty-state">No applications yet. <a href="{{ url_for('applications_add') }}">Add one!</a></p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="card">
+    <h2 class="card-title">Quick Actions</h2>
+    <div class="quick-actions">
+        <a href="{{ url_for('companies_add') }}" class="btn btn-primary">+ Add Company</a>
+        <a href="{{ url_for('jobs_add') }}" class="btn btn-primary">+ Add Job</a>
+        <a href="{{ url_for('applications_add') }}" class="btn btn-primary">+ Add Application</a>
+        <a href="{{ url_for('contacts_add') }}" class="btn btn-primary">+ Add Contact</a>
+        <a href="{{ url_for('job_match') }}" class="btn btn-secondary">&#128269; Job Match</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}{{ action }} Contact - Job Tracker{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>{{ action }} Contact</h1>
+    <a href="{{ url_for('contacts_list') }}" class="btn btn-secondary">&larr; Back to List</a>
+</div>
+
+<div class="card form-card">
+    <form method="POST">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="contact_name">Contact Name <span class="required">*</span></label>
+                <input type="text" id="contact_name" name="contact_name"
+                       value="{{ contact.get('contact_name', '') }}" required placeholder="e.g. Alice Johnson">
+            </div>
+            <div class="form-group">
+                <label for="title">Job Title</label>
+                <input type="text" id="title" name="title"
+                       value="{{ contact.get('title', '') }}" placeholder="e.g. HR Manager">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="company_id">Company</label>
+            <select id="company_id" name="company_id">
+                <option value="">— Select Company —</option>
+                {% for c in companies %}
+                <option value="{{ c.company_id }}" {{ 'selected' if contact.get('company_id') == c.company_id }}>
+                    {{ c.company_name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email"
+                       value="{{ contact.get('email', '') }}" placeholder="alice@company.com">
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone</label>
+                <input type="tel" id="phone" name="phone"
+                       value="{{ contact.get('phone', '') }}" placeholder="305-555-0101">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="linkedin_url">LinkedIn URL</label>
+            <input type="url" id="linkedin_url" name="linkedin_url"
+                   value="{{ contact.get('linkedin_url', '') }}" placeholder="https://linkedin.com/in/username">
+        </div>
+
+        <div class="form-group">
+            <label for="notes">Notes</label>
+            <textarea id="notes" name="notes" rows="3"
+                      placeholder="How you met, context, etc.">{{ contact.get('notes', '') }}</textarea>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">{{ action }} Contact</button>
+            <a href="{{ url_for('contacts_list') }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

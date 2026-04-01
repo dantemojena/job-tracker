@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Contacts - Job Tracker{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Contacts</h1>
+    <a href="{{ url_for('contacts_add') }}" class="btn btn-primary">+ Add Contact</a>
+</div>
+
+{% if contacts %}
+<div class="table-wrapper">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Title</th>
+                <th>Company</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>LinkedIn</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for contact in contacts %}
+            <tr>
+                <td><strong>{{ contact.contact_name }}</strong></td>
+                <td>{{ contact.title or '—' }}</td>
+                <td>{{ contact.company_name or '—' }}</td>
+                <td>
+                    {% if contact.email %}
+                        <a href="mailto:{{ contact.email }}" class="link">{{ contact.email }}</a>
+                    {% else %}
+                        —
+                    {% endif %}
+                </td>
+                <td>{{ contact.phone or '—' }}</td>
+                <td>
+                    {% if contact.linkedin_url %}
+                        <a href="{{ contact.linkedin_url }}" target="_blank" class="link">Profile</a>
+                    {% else %}
+                        —
+                    {% endif %}
+                </td>
+                <td class="actions-cell">
+                    <a href="{{ url_for('contacts_edit', contact_id=contact.contact_id) }}" class="btn btn-sm btn-secondary">Edit</a>
+                    <form method="POST" action="{{ url_for('contacts_delete', contact_id=contact.contact_id) }}" class="inline-form"
+                          onsubmit="return confirm('Delete {{ contact.contact_name }}? This cannot be undone.');">
+                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state-box">
+    <p>No contacts added yet.</p>
+    <a href="{{ url_for('contacts_add') }}" class="btn btn-primary">+ Add Your First Contact</a>
+</div>
+{% endif %}
+{% endblock %}
